@@ -3,32 +3,41 @@
 LOG="./tests.log"
 
 teardown() {
-    echo "$BATS_TEST_NAME" >> "$LOG"
     if [[ "$(git config user.name)" != "Lauren Stephenson" ]]; then
         $(git config user.name Lauren Stephenson)
     fi
+
+    if [[ "$(git config user.email)" != "compscilauren@gmail.com" ]]; then
+        $(git config user.email compscilauren@gmail.com)
+    fi
 }
 
-@test "correct name" {
-    testName="Lauren Stephenson"
- 
-    [[ "$(git config user.name)" == $testName ]]
-}
-
-@test "incorrect name" {
+@test "incorrect name throws error" {
     testName="First Last"
+    $(git config user.name $testName)
 
-    [[ "$(git config user.name)" != $testName ]]
+    { # try
+        runGitCommit="$(git commit -m 'Failed commit')"
+    } || { # catch
+        date >> "$LOG"
+        echo "incorrect name throws error test: PASS" >> "$LOG"
+        echo "" >> "$LOG"
+        echo "--------------------------------------------" >> "$LOG"
+        echo "" >> "$LOG"
+    }
 }
 
-@test "correct email" {
-    testEmail="compscilauren@gmail.com"
-
-    [[ "$(git config user.email)" == $testEmail ]]
-}
-
-@test "incorrect email" {
+@test "incorrect email throws error" {
     testEmail="first.last@gmail.com"
+    $(git config user.email $testEmail)
 
-    [[ "$(git config user.email)" != $testEmail ]]
+    { # try
+        runGitCommit="$(git commit -m 'Failed commit')"
+    } || { # catch
+        date >> "$LOG"
+        echo "incorrect email throws error test: PASS" >> "$LOG"
+        echo "" >> "$LOG"
+        echo "--------------------------------------------" >> "$LOG"
+        echo "" >> "$LOG"
+    }
 }
